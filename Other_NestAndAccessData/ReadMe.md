@@ -7,7 +7,7 @@ The charts use v5, vanilla js and are created in a single file to aid noobs. I m
 
 The charts use the new updated pattern adapted from the Rob Moore blog examples. Also, lean on the newer .merge() and .join() configurations, see the GUP.
 
-List of example charts:
+List of *reusable* example charts:
   - **Example 1** d3v4 Line Chart
   - **Example 2** d3v4 Multi-Line Chart with Nesting
   - **Example 3** d3v4 Rollup Data Bar Chart
@@ -16,7 +16,7 @@ List of example charts:
   - **Example 6** d3v4 Multi-Line Chart with Nested Data, Dropdown Menu, and Updating Y-Axis
   - **Example 7** d3v4 Multi-Line Chart, Nested Data, and 2 Dropdown Menus
 
-Original charts: 
+Original chart examples: 
 - GitHub repository: https://gist.github.com/ProQuestionAsker
 - bl.ocks:
   - **Example 1** d3v4 Line Chart https://bl.ocks.org/ProQuestionAsker/9a909417edf206f2d3ff38cd41a30524
