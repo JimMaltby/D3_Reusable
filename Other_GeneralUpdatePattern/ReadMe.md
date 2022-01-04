@@ -1,3 +1,5 @@
+# Reusable General Update Pattern (GUP) - notebooks - Alphabet Examples
+
 Creating reusable (v5) charts from the alphabet examples in Mike Bostock's blog (observable notebook/ bl.ock) "General Update Pattern (GUP)" (https://observablehq.com/@d3/general-update-pattern) and "*selections*.join" (https://observablehq.com/@d3/selection-join).
 In addition I include John Gómez's "General Update Pattern Explained" as this provides further understanding of how the GUP works.
 
