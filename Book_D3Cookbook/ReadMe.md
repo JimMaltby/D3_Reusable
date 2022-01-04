@@ -1,4 +1,4 @@
-*Reusable D3 Cookbook Examples
+# Reusable D3 Cookbook Examples
 
 Creating reusable (v5) charts from the examples in "Data Visulization with D3.js Cookbook" (https://www.packtpub.com/product/data-visualization-with-d3-js-cookbook/9781782162162) by Nick Qu Zhu 
 
