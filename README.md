@@ -8,6 +8,7 @@ Project list:
 
 Book examples
 
+- ProD3.js
 - D3v5 Tips and Tricks
 - D3 CookBook
 - Mastering D3
