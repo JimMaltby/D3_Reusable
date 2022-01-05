@@ -2,7 +2,7 @@
 A collection of projects to develop charts using the reusable pattern. The pattern largely taken from ProD3 (https://link.springer.com/book/10.1007/978-1-4842-5203-1).
 
 Learning to develop the pattern by translating existing d3v3 into d3v5 (most books are written in v3). 
-They are generally written in vanilla js with one file. Although I recognise this is not best practice, I found it easier to understand when I was new and learning d3, so thought keeping this may aid others. I intend to update the charts in modules as well, if I get around to it.
+They are generally written in vanilla js with one file. The charts are not written mainly in ES2015, there are some ES2015 elements. Although I recognise this is not best practice, I found it easier to understand when I was new and learning d3, so thought keeping this may aid others. I intend to update the charts in modules and make ES2015 as well, if I get around to it.
 
 Project list:
 
