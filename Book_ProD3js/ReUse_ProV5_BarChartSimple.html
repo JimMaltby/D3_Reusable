@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+  <!-- load the d3.js library -->    	
+  <script src="https://unpkg.com/d3@5.16.0/dist/d3.min.js"></script>
+    <style>
+      .axis path, .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+      }
+      .axis path {
+        fill: none;
+        stroke: black;
+      }
+      .text {
+ 	 display: block;
+         white-space: nowrap;
+       }
+      .bar {
+        fill: steelblue;
+        stroke: white;
+      }
+      .bar:hover {
+        fill: brown;
+        stroke: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="span12 page-header">
+          <h1>
+            Reusable version Simple Bar Chart With Axes and Interaction V5
+          </h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span12 lead">
+          Chart shows Simple Bar Chart (d3v5) based on the std Mike B: with MouseOverHover Highlighting
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset3">
+          <div id="figure1"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset3">
+          <div id="figure2"></div>
+        </div>
+      </div>
+    </div>
+</body>
+
+
+<script>
+d3.reusable = {};
+
+d3.reusable.barChart = function module() {
+
+    // Attributes
+    let data;
+    let svg;
+    let margin = {
+        top: 20,
+        right: 20,
+        bottom: 30,
+        left: 40
+    };
+    let width = 960;
+    let height = 500;
+    let chartWidth;
+    let chartHeight;
+    let xScale;
+    let yScale;
+    let xAxis;
+    let yAxis;
+
+    // Dispatcher object to broadcast the 'customHover' event
+    const dispatcher = d3.dispatch('customMouseOver'); //v3 = "const dispatch"
+
+    // extractors
+    const getFrequency = ({frequency}) => frequency;
+    const getLetter = ({letter}) => letter;
+
+
+    function exports(_selection){
+        _selection.each(function(_data){
+            data = _data;
+            chartHeight = height - margin.top - margin.bottom;
+            chartWidth = width - margin.left - margin.right;
+
+            buildScales();
+            buildAxes();
+            buildSVG(this);
+            drawAxes();
+            drawBars();
+        });
+    }
+
+    function buildAxes(){
+        xAxis = d3.axisBottom(xScale);			//v3 = "d3.svg.axis().scale(xScale).orient("bottom");"
+
+        yAxis = d3.axisLeft(yScale).ticks(10, '%');	//v3 = "d3.svg.axis().scale(yScale).orient("left");"
+    }
+
+    function buildContainerGroups(){
+        let container = svg
+          .append('g')
+            .classed('container-group', true)
+            .attr(
+                'transform',
+                `translate(${margin.left},${margin.top})`
+            );
+
+        container
+          .append('g')
+            .classed('chart-group', true);
+        container
+          .append('g')
+            .classed('x-axis-group axis', true);
+        container
+          .append('g')
+            .classed('y-axis-group axis', true);
+    }
+
+    function buildScales(){
+        xScale = d3.scaleBand()			//v3 = scale.ordinal
+            .rangeRound([0, chartWidth])
+	    .padding(0.1)			//v3 = "rangeRoundBands([0, chartWidth], 0.1)"
+            .domain(data.map(getLetter));
+
+        yScale = d3.scaleLinear()	//v3 = d3.scale.linear 
+            .range([chartHeight, 0])
+            .domain([0, d3.max(data, getFrequency)]);
+    }
+
+    function buildSVG(container){
+        if (!svg) {
+            svg = d3.select(container)
+              .append('svg')
+                .classed('bar-chart', true);
+
+            buildContainerGroups();
+        }
+        svg
+            .attr('width', width)
+            .attr('height', height);
+    }
+
+    function drawAxes(){
+        svg.select('.x-axis-group.axis')
+            .attr('transform', `translate(0,${chartHeight})`)
+            .call(xAxis);
+
+        svg.select('.y-axis-group.axis')
+            .call(yAxis)
+              .append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', 6)
+                .attr('dy', '0.71em')
+                .attr('text-anchor', 'end')
+		.style('fill', 'black')
+                .text('Frequency');
+    }
+
+    function drawBars(){
+        let bars = svg.select('.chart-group').selectAll('.bar')
+            .data(data);
+
+        // Enter
+        bars.enter()
+          .append('rect')
+            .classed('bar', true)
+            .attr('x', ({letter}) => xScale(letter))
+            .attr('y', ({frequency}) => yScale(frequency))
+            .attr('width', xScale.bandwidth()) 		//** v3 = xScale.rangeBand())		
+            .attr('height', ({frequency}) => chartHeight - yScale(frequency))
+	    .on('mouseover', function(d) { 
+		dispatcher.call('customMouseOver', this, d);
+		});
+
+        bars.exit()
+            .style('opacity', 0)
+            .remove();
+    }
+
+    exports.height = function(_x) {
+        if (!arguments.length) {
+            return height;
+        }
+        height = _x;
+
+        return this;
+    };
+
+    exports.margin = function(_x) {
+        if (!arguments.length) {
+            return margin;
+        }
+        margin = {
+            ...margin,
+            ..._x
+        };
+
+        return this;
+    };
+
+    exports.width = function(_x) {
+        if (!arguments.length) {
+            return width;
+        }
+        width = _x;
+
+        return this;
+    };
+
+    exports.on = function() {
+        let value = dispatcher.on.apply(dispatcher, arguments);
+
+        return value === dispatcher ? exports : value;
+    };
+
+    return exports;
+};
+
+// Usage
+/////////////////////////////////
+
+d3.tsv("data.tsv")
+	.then((data) => {
+		return data.map((d) => {
+        		d.frequency = +d.frequency;
+			return d;
+		});
+	})
+	.then((data) => {
+
+	    let barChart = d3.reusable.barChart()
+				.width(700)
+				.height(400)
+				.margin({
+        				left: 50,
+        				bottom: 30
+    				})
+				.on('customMouseOver', function(event, data) {
+        				console.log('data', data);
+    					});
+				;
+
+	    d3.select("#figure1")
+	        .datum(data)
+	        .call(barChart);
+	})
+	.catch((error) => {
+		throw error;
+	});
+    </script>
+</html>
