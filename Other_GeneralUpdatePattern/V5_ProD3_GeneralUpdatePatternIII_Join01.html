@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>General Update Pattern - alphabet example: reusable v5 .join()</title>
+<script src="https://unpkg.com/d3@5.16.0/dist/d3.min.js"></script>
+</head>
+
+<style>
+
+text {
+  font: bold 48px monospace;
+}
+
+.enter {
+  fill: green;
+}
+
+.update {
+  fill: #333;
+}
+
+.exit {
+  fill: brown;
+}
+</style>
+
+<body>
+<div id = 'chart1'></div>
+
+<script type="text/javascript">
+//reusable script
+d3.reusable = {};
+d3.reusable.lineChart = function module() {
+
+    // Attributes
+    // let _data = {};
+    let _width = 900, _height = 300, // <-1B
+            _margins = {top: 30, left: 30, right: 30, bottom: 30},
+            _x, _y,
+            data = [],
+            _coloUrs = d3.scaleOrdinal(d3.schemeCategory10),
+            _svg,
+            _bodyG,
+            _line;
+
+    
+    function _exports(_selection){
+        _selection.each(function(data){
+            // data = _data;
+            chartHeight = _height - _margins.top - _margins.bottom;
+            chartWidth = _width - _margins.left - _margins.right;
+
+            svgBody(this);
+            drawText();
+
+
+});
+    }
+
+    function buildContainerGroups(){
+        let container = _svg
+          .append('g')
+            .classed('container-group', true)
+            .attr(
+                'transform',
+                `translate(${_margins.left},${_margins.top + chartHeight / 2})`
+            );
+
+
+
+        container
+          .append('g')
+            .classed('chart-group', true);
+    }
+
+
+    function svgBody(container){
+        if (!_svg) {
+            _svg = d3.select(container).append('svg')
+                .classed('chart', true)
+                ;
+
+            buildContainerGroups();
+        }
+        _svg
+            .attr('width', _width)
+            .attr('height', _height);
+    }
+
+    function drawText(){
+
+        const t = d3.transition()
+                .duration(5000);
+
+        let _bodyText = _svg.select(".chart-group")
+            .selectAll('text')
+            .data(
+                data,
+                function (d) {    // joins inner array of each object
+                	return d;
+            		}
+                )
+            ;
+
+        // // ENTER new elements present in new data.
+        _bodyText
+          		.join("text")
+                .attr("class", "enter")
+                .attr("dy", ".35em")
+                .attr("x", function(d, i) { return i * 32; })
+                .attr("y", 0)
+                .style("fill-opacity", 1)
+                .text(function(d) { return d; })
+                ;
+
+
+
+        updateText = function () {
+          
+            _updateBodyText =  _svg.select(".chart-group")
+                .selectAll('text')
+                    .data(data, function(d) { return d; })
+            ;
+            
+            console.log({data});
+
+            _updateBodyText 
+                .join(
+
+                enter => enter.append("text")
+                    .attr("fill", "green")
+                    .attr("x", (d, i) => i * 32)
+                    .attr("y", -60)
+                    .text(d => d)
+                .call(enter => enter.transition(t)
+                    .attr("y", 0)),
+                update => update
+                    .attr("fill", "black")
+                    .attr("y", 0)
+                .call(update => update.transition(t)
+                    .attr("x", (d, i) => i * 32)),
+                exit => exit
+                    .attr("fill", "brown")
+                .call(exit => exit.transition(t)
+                    .attr("y", 60)
+                    .remove())
+            );
+        }
+
+ 
+    }
+
+    _exports.width = function (w) {
+        if (!arguments.length) return _width;
+        _width = w;
+        return _exports;
+    };
+
+    _exports.height = function (h) { // <-1C
+        if (!arguments.length) return _height;
+        _height = h;
+        return _exports;
+    };
+
+    _exports.margins = function (m) {
+        if (!arguments.length) return _margins;
+        _margins = m;
+        return _exports;
+    };
+
+    _exports.colors = function (c) {
+        if (!arguments.length) return _colors;
+        _colors = c;
+        return _exports;
+    };
+
+    _exports.x = function (x) {
+        if (!arguments.length) return _x;
+        _x = x;
+        return _exports;
+    };
+
+    _exports.y = function (y) {
+        if (!arguments.length) return _y;
+        _y = y;
+        return _exports;
+    };
+
+
+
+
+
+
+
+    _exports.data = function(_x) {
+        if (!arguments.length) {
+            return data;
+        }
+        data = _x;
+
+        if (typeof updateText === 'function') updateText(); //**
+
+        return _exports;
+    };
+
+    return _exports;
+}
+
+/////////////////////////////
+
+let alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+
+let data = alphabet;
+
+let lineChart = d3.reusable.lineChart().data(data);
+
+
+// console.log({data});
+
+d3.select("#chart1")
+            .call(lineChart.data(data));
+
+// newData = createData();
+// function createNewData (data) {
+
+// };
+
+// let newData = createData();
+
+// console.log({newData});
+
+function update(_data) {
+
+    lineChart.data(_data);
+};
+
+
+
+
+// Grab a random sample of letters from the alphabet, in alphabetical order.
+d3.interval(function() {
+    let newData = d3.shuffle(alphabet)
+        .slice(0, Math.floor(Math.random() * 26))
+        .sort();
+    console.log(newData);
+    update(newData);
+}, 3000)
+
+</script>
+
+
+</body>
+
+</html>
